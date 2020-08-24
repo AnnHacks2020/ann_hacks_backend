@@ -29,10 +29,9 @@ function makeRoom(hostUserId, theme, maxMembers, due){
     var image = null;//!NOTICE!白紙を代入したい
     var fav = 0;
 
-    //member配列は最初が作成者ユーザID, 以降は0で初期化
-    var member = new Array(maxMembers);
-    member.fill(0);
-    member[0] = hostUserId;
+    //member配列の最初に作成者ユーザIDを入れておく//
+    var member = new Array();
+    member.push(hostUserId);
 
     //ハッシュテーブルinkはメンバーIDをキーとし残りインク量を返します
     var ink = new Map();
@@ -52,6 +51,8 @@ function makeRoom(hostUserId, theme, maxMembers, due){
         ink: ink,
         deadline: deadline
     });
+
+    return roomId;
 }
 
 //getRoomListNo:ルームIDを引数とし，ルームリスト内での配列番号を返します
@@ -67,9 +68,8 @@ function getRoom(roomId){
 //enterRoom:ユーザID，ルームIDを引数とし，ルームメンバーにユーザ情報を追加します
 function enterRoom(userId, roomId){
     var roomListNo = getRoomListNo(roomId);
-    roomList[roomListNo]/////////////////////////////
-}
-
-function favorRoom(){
-
+    if( roomList[roomListNo].member.length < roomList[roomListNo].maxMembers ){
+        roomList[roomListNo].member.push(userId);
+        roomList[roomListNo].ink.set(userId, MAXINK);
+    }
 }
