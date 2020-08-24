@@ -30,4 +30,4 @@ app.get("/", (req, res) => {
   });
 });
 
-app.listen(process.env.ENV_PASS || 3000);
+app.listen(process.env.ENV_PORT || 3000);
