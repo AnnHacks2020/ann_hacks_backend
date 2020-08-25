@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
         if (err) {
           throw err;
         }
-        console.log(result.rows[0].theme);
+        res.send(result.rows[0].theme);
       });
     }
   });
