@@ -1,34 +1,30 @@
 const express = require("express");
-const mysql = require("mysql");
-const redis = require("redis");
-const config = {
-  host: "127.0.0.1",
-  port: 6379,
-};
-//const client = redis.createClient(config);
+const pg = require("pg");
+const pool = new pg.Pool({
+  host: process.env.ENV_HOST,
+  database: process.env.ENV_DB,
+  user: process.env.ENV_USER,
+  port: 5432,
+  password: process.env.ENV_PASS,
+});
 
 const app = express();
 const port = 3000;
 
-// const connection = mysql.createConnection({
-//   host: "localhost",
-//   user: "root",
-//   password: "",
-//   database: "ekaki_app",
-// });
-
-// connection.connect((err) => {
-//   if (err) {
-//     console.log("error connecting: " + err.stack);
-//     return;
-//   }
-//   console.log("success");
-// });
-
 app.get("/", (req, res) => {
-  res.send("Hello World!");
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query("SELECT theme FROM ROOMS", function (err, result) {
+        if (err) {
+          throw err;
+        }
+        res.send(result.rows[0].theme);
+      });
+    }
+  });
 });
 
-app.listen(process.env.PORT || port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
-});
+console.log(process.env.ENV_DB, process.env.ENV_USER);
+app.listen(process.env.PORT || 3000);

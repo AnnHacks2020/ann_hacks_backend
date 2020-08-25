@@ -9,17 +9,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/nagao-lab/ann_hacks_backend.git"
+    "url": "git+https://github.com/AnnHacks2020/ann_hacks_backend.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/nagao-lab/ann_hacks_backend/issues"
+    "url": "https://github.com/AnnHacks2020/ann_hacks_backend/issues"
   },
-  "homepage": "https://github.com/nagao-lab/ann_hacks_backend#readme",
+  "homepage": "https://github.com/AnnHacks2020/ann_hacks_backend#readme",
   "dependencies": {
     "express": "^4.17.1",
     "mysql": "^2.18.1",
+    "pg": "^8.3.2",
     "redis": "^3.0.2"
   }
 }
