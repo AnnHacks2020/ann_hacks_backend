@@ -1,3 +1,11 @@
+/*
+    Userクラス
+    userId: ユーザID
+    LikeList: いいねしたルームのID配列
+    favor(roomId): ルームIDをLikeListに追加
+ */
+
+
 function User(userId){
     this.userId = userId;
     this.LikeList = new Array();
@@ -5,3 +13,5 @@ function User(userId){
         LikeList.push(roomId);
     }
 }
+
+module.exports = User;

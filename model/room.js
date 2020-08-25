@@ -71,5 +71,14 @@ function enterRoom(userId, roomId){
     if( roomList[roomListNo].member.length < roomList[roomListNo].maxMembers ){
         roomList[roomListNo].member.push(userId);
         roomList[roomListNo].ink.set(userId, MAXINK);
+        return "Admission succeeded.";
+    }
+    else{
+        return "Admission failed: the room is full.";
     }
 }
+
+
+module.exports = makeRoom;
+module.exports = getRoom;
+module.exports = enterRoom;
