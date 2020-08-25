@@ -2,7 +2,7 @@ const express = require("express");
 const pg = require("pg");
 const pool = new pg.Pool({
   host: process.env.ENV_HOST,
-  databese: "ddsip3ad8jodbv",
+  database: "ddsip3ad8jodbv",
   user: "eljuqgwscxejta",
   port: 5432,
   password: process.env.ENV_PASS,
