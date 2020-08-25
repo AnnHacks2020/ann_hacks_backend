@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
     if (err) {
       console.log(err);
     } else {
+      console.log("else");
       client.query("SELECT theme FROM ROOMS", function (err, result) {
         if (err) {
           throw err;
