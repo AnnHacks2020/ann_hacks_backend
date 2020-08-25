@@ -78,7 +78,24 @@ function enterRoom(userId, roomId){
     }
 }
 
+//favorRoom:指定したルームのfavをインクリメントします
+//disfavorRoom:指定したルームのfavをデクリメントします
+function favorRoom(roomId){
+    var roomListNo = getRoomListNo(roomId);
+    roomList[roomListNo].fav++;
+}
+function disfavorRoom(roomId){
+    var roomListNo = getRoomListNo(roomId);
+    roomList[roomListNo].fav--;
+}
+
+//useInk:指定したルームのメンバーのInkを
+//usedInkAmountはint型で，マイナス値を入力することでインク量を巻き戻します
+
+
 
 module.exports.makeRoom = makeRoom;
 module.exports.getRoom = getRoom;
 module.exports.enterRoom = enterRoom;
+module.exports.favorRoom = favorRoom;
+module.exports.disfavorRoom = disfavorRoom;

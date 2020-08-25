@@ -2,9 +2,9 @@ const express = require("express");
 const pg = require("pg");
 const pool = new pg.Pool({
   host: process.env.ENV_HOST,
-  databese: process.env.ENV_DB,
+  database: process.env.ENV_DB,
   user: process.env.ENV_USER,
-  port: process.env.ENV_PORT,
+  port: 5432,
   password: process.env.ENV_PASS,
 });
 
@@ -20,14 +20,11 @@ app.get("/", (req, res) => {
         if (err) {
           throw err;
         }
-        res.render("index", {
-          title: "Express",
-          datas: result.rows[0].theme,
-        });
-        console.log(result);
+        res.send(result.rows[0].theme);
       });
     }
   });
 });
 
-app.listen(port);
+console.log(process.env.ENV_DB, process.env.ENV_USER);
+app.listen(process.env.PORT || 3000);
