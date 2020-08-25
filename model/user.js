@@ -14,4 +14,4 @@ function User(userId){
     }
 }
 
-module.exports = User;
+module.exports.User = User;

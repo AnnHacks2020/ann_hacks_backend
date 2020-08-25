@@ -79,6 +79,6 @@ function enterRoom(userId, roomId){
 }
 
 
-module.exports = makeRoom;
-module.exports = getRoom;
-module.exports = enterRoom;
+module.exports.makeRoom = makeRoom;
+module.exports.getRoom = getRoom;
+module.exports.enterRoom = enterRoom;

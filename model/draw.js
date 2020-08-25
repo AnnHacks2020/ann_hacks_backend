@@ -1,8 +1,8 @@
 //まだ何もしてません...
 
-function Draw(){
-    this.roomId = null;
+function Draw(roomId, userId){
+    this.roomId = roomId;
+    this.userId = userId;
     this.time = null;
-    this.userId = null;
     this.track = null;
 }
