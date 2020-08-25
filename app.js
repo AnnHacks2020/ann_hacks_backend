@@ -21,11 +21,6 @@ app.get("/", (req, res) => {
           throw err;
         }
         console.log(result.rows[0].theme);
-        res.render("index", {
-          title: "Express",
-          datas: result.rows[0].theme,
-        });
-        console.log(result);
       });
     }
   });
