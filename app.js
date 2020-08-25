@@ -16,11 +16,11 @@ app.get("/", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      console.log("else");
       client.query("SELECT theme FROM ROOMS", function (err, result) {
         if (err) {
           throw err;
         }
+        console.log(result.rows[0].theme);
         res.render("index", {
           title: "Express",
           datas: result.rows[0].theme,
