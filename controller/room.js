@@ -1,7 +1,7 @@
 var app = require('express')();
 var server = require('http').Server(app);
 var user = require("../model/user");
-var io = require("./io");
+// var io = require("./io");
 
 // http://localhost:8124/test2/?id=121
 app.get('/', function (req, res) {
@@ -14,7 +14,7 @@ app.get('/', function (req, res) {
     var myUser = new user.User(1);
     console.log(myUser);
     console.log(myUser.userId);
-    io(server);
+    // io(server);
     res.sendFile(__dirname + "/index.html");
 });
 

@@ -5,8 +5,6 @@ function io(server) {
 
     var store = {};
 
-    console.log(server);
-
     io.on('connection', function (socket) {
         console.log("connection");
         socket.on('join', function (msg) {
@@ -16,46 +14,26 @@ function io(server) {
             };
             store[msg.id] = usrobj;
             socket.join(msg.roomid);
-            console.log(msg, usrobj);
-            console.log("join!!");
         });
 
-        // socket.on('chat message', function (msg) {
-        //     io.to(store[msg.id].room).emit('chat message', msg);
-        // });
-        // socket.on('map message', function (msg) {
-        //     io.to(store[msg.id].room).emit('map message', msg);
-        // });
+        // クライアントからメッセージ受信
         socket.on('clear send', function (msg) {
-            console.log("clear send受け取り clear user送信 to " + store[msg.id].room)
-            io.to(store[msg.id].room).emit('clear user');
+            // 自分以外の全員に送る
+            // io.to(store[msg.id].room).emit('clear user'); //こちらだと自分にも送られる
+            socket.broadcast.to(store[msg.id].room).emit('clear user');
         });
+        // クライアントからメッセージ受信
         socket.on('server send', function (msg) {
             // 自分以外の全員に送る
-            console.log("server send受け取り send user送信 to " + store[msg.id].room)
-            io.to(store[msg.id].room).emit('send user', msg);
+            // io.to(store[msg.id].room).emit('send user', msg); //こちらだと自分にも送られる
+            socket.broadcast.to(store[msg.id].room).emit('send user', msg);
         });
-        // socket.on('map message', function (msg) {
-        //     io.to(store[msg.id].room).emit('map message', msg);
-        // });
-        // クライアントからメッセージ受信
-        // socket.on('clear send', function () {
     
-        //     // 自分以外の全員に送る
-        //     socket.broadcast.emit('clear user');
-        // });
-    
-        // // クライアントからメッセージ受信
-        // socket.on('server send', function (msg) {
-    
-        //     // 自分以外の全員に送る
-        //     socket.broadcast.emit('send user', msg);
-        // });
-    
-        // // 切断
-        // socket.on('disconnect', function () {
-        //     io.sockets.emit('user disconnected');
-        // });
+        // 切断 (この項目の必要性不明)
+        socket.on('disconnect', function (msg) {
+            console.log(msg);
+            // io.to(store[msg.id].room).emit('user disconnected');
+        });
     });
 }
 module.exports = io;

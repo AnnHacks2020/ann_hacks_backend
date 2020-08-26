@@ -143,17 +143,20 @@ $(function() {
  
     $('#clear').click(function(e) {
         socket.emit('clear send', {
-            roomid: 1,
+            roomid: join,
             name: "myname",
-            id: 1
+            id: join
     });
         e.preventDefault();
         context.clearRect(0, 0, $('canvas').width(), $('canvas').height());
     });
 
     $('#disconnect').click(function(e) {
-        socket.emit('disconnect');
+        socket.emit('disconnect', {roomid: join, name: "myname", id: join});
+        console.log("emmited disconnect");
         socket.disconnect();
+        console.log("socket disconnect");
+        window.location.href = './';
     });
  
     function draw(e) {
