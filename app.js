@@ -13,16 +13,13 @@ const app = express();
 const port = 3000;
 
 app.get("/", (req, res) => {
-  const now = Date.now();
-  var userID;
   console.log(JSON.stringify(req.headers));
   if (req.headers.cookie == undefined) {
+    const now = Date.now();
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
-    userID = res.header.cookie;
-    console.log("if:" + userID);
+    userID = now;
   } else {
     userID = req.headers.cookie;
-    console.log("else:" + userID);
   }
   pool.connect(function (err, client) {
     if (err) {
