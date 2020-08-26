@@ -85,5 +85,4 @@ app.post("/", (req, res) => {
   });
 });
 
-// app.listen(process.env.PORT || port);
-app.listen(port);
+app.listen(process.env.PORT || port);
