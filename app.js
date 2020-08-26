@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
   } else {
     userID = req.headers.cookie;
   }
+  console.log(userID);
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
