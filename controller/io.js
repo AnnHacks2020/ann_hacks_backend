@@ -1,4 +1,5 @@
-var socketio = require('socket.io');
+const socketio = require('socket.io');
+const room = require("../model/room");
 
 function io(server) {
     var io = socketio.listen(server);
@@ -14,6 +15,9 @@ function io(server) {
             };
             store[msg.id] = usrobj;
             socket.join(msg.roomid);
+            console.log(room.enterRoom(msg.id, msg.roomid));
+            // 画像を送信 
+            socket.broadcast.to(store[msg.id].room).emit('send image'/*, image*/);
         });
 
         // クライアントからメッセージ受信
