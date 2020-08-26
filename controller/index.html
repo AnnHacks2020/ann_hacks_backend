@@ -71,6 +71,8 @@ $(function() {
     var context = $("canvas").get(0).getContext('2d');
     var socket = io.connect('http://localhost:3000');
 
+    var join = 0;
+
     console.log("socket:" + socket);    
     $('#join').click(function() {
         socket.emit('join', {
@@ -78,6 +80,7 @@ $(function() {
             name: "myname",
             id: 1
         });
+        join = 1;
         console.log("join!!");
     });
     $('#join2').click(function() {
@@ -86,6 +89,7 @@ $(function() {
             name: "myname2",
             id: 2
         });
+        join = 2;
         console.log("join2!!");
     });
 
@@ -97,6 +101,7 @@ $(function() {
     
     // サーバからメッセージ受信
     socket.on('send user', function (msg) {
+        console.log("send user受け取り:" + msg);
         context.strokeStyle = msg.color;
         context.lineWidth = 2;
         context.beginPath();
@@ -107,6 +112,7 @@ $(function() {
     });
  
     socket.on('clear user', function () {
+        console.log("clear user受け取り");
         context.clearRect(0, 0, $('canvas').width(), $('canvas').height());
     });
  
@@ -161,7 +167,7 @@ $(function() {
         context.closePath();
  
         // サーバへメッセージ送信
-        socket.emit('server send', { fx:fromX, fy:fromY, tx:toX, ty:toY, color:context.strokeStyle, roomid: 1, name: "myname", id: 1 });
+        socket.emit('server send', { fx:fromX, fy:fromY, tx:toX, ty:toY, color:context.strokeStyle, roomid: join, name: "myname", id: join });
         fromX = toX;
         fromY = toY;
     }

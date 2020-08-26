@@ -27,10 +27,12 @@ function io(server) {
         //     io.to(store[msg.id].room).emit('map message', msg);
         // });
         socket.on('clear send', function (msg) {
+            console.log("clear send受け取り clear user送信 to " + store[msg.id].room)
             io.to(store[msg.id].room).emit('clear user');
         });
         socket.on('server send', function (msg) {
             // 自分以外の全員に送る
+            console.log("server send受け取り send user送信 to " + store[msg.id].room)
             io.to(store[msg.id].room).emit('send user', msg);
         });
         // socket.on('map message', function (msg) {
