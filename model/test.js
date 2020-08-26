@@ -1,11 +1,13 @@
 //$ node test.js
 
-var user = require('./user');
+var room = require('./room');
 
 function test(){
-    var myUser = new user.User(1);
-    console.log(myUser);
-    console.log(myUser.userId);
+    var roomId = room.makeRoom("Kyosuke", "Natsumatsuri", 6, 100000);
+    console.log("Room ID: " + roomId + " の情報を取得します");
+    var myRoom = room.getRoom(roomId);
+    console.log(myRoom);
+    
 }
 
 test();
