@@ -18,40 +18,40 @@ app.get("/", (req, res) => {
     const now = Date.now();
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
     userID = now;
+    pool.connect(function (err, client) {
+      if (err) {
+        console.log(err);
+      } else {
+        client.query(
+          {
+            text: "INSERT INTO users(id) VALUES($1)",
+            values: [userID],
+          },
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+            res.send(result.rows[0]);
+          }
+        );
+      }
+    });
   } else {
     userID = req.headers.cookie;
   }
+
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
     } else {
-      client.query(
-        {
-          text: "INSERT INTO users(id) VALUES($1)",
-          values: [userID],
-        },
-        function (err, result) {
-          if (err) {
-            throw err;
-          }
-          res.send(result.rows[0]);
+      client.query("SELECT theme FROM ROOMS", function (err, result) {
+        if (err) {
+          throw err;
         }
-      );
+        res.send("Welcome " + userID + result.rows[0].theme);
+      });
     }
   });
-
-  // pool.connect(function (err, client) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     client.query("SELECT theme FROM ROOMS", function (err, result) {
-  //       if (err) {
-  //         throw err;
-  //       }
-  //       res.send(result.rows[0].theme);
-  //     });
-  //   }
-  // });
 });
 
 app.post("/", (req, res) => {
