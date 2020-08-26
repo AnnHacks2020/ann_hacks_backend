@@ -14,7 +14,14 @@ var roomList = new Array();
 
  */
 
-
+const pg = require("pg");
+const pool = new pg.Pool({
+    host: process.env.ENV_HOST,
+    database: process.env.ENV_DB,
+    user: process.env.ENV_USER,
+    port: 5432,
+    password: process.env.ENV_PASS,
+});
 
 const MAXINK = 100000;
 var inc = 0;
@@ -26,10 +33,8 @@ function newId(){
 
 //makeRoom:新規テーマ部屋を作ります
 //hostUserId:作成者ユーザID, theme:テーマ文字列, maxMembers:最大人数, due:期間
-function makeRoom(hostUserId, theme, maxMembers, due){
+function makeRoom(hostUserId, theme, maxMembers, due, image, ink){
     var roomId = newId();
-    var image = null;//!NOTICE!白紙を代入したい
-    var fav = 0;
 
     //member配列の最初に作成者ユーザIDを入れておく//
     var member = new Array();
@@ -42,17 +47,22 @@ function makeRoom(hostUserId, theme, maxMembers, due){
     //deadlineには期日のIntが入る
     var deadline = Date.now() + due;//!NOTICE!dueの単位がミリ秒である必要があります
 
-    roomList.push({
-        roomId: roomId,
-        hostUserId: hostUserId,
-        theme: theme,
-        maxMembers: maxMembers,
-        image: image,
-        fav: fav,
-        member: member,
-        ink: ink,
-        deadline: deadline
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //roomsテーブル
+            client.query("INSERT INTO rooms(due, fav, id, img, theme) VALUES (" + deadline + ", 0, " + roomId + ", " + image + ", " + theme + ")", function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+            //
+            //client.query();
+        }
     });
+    
 
     return roomId;
 }
@@ -101,6 +111,28 @@ function useInk(userId, roomId, usedInkAmount){
     return next_amount;
 }
 
+//update():画像とインク量を更新します
+function update(roomId, userId, base64Image, restInk){
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //roomsテーブル
+            client.query("UPDATE rooms SET img = " + base64Image + " WHERE id = " + roomId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+            //memberテーブル
+            client.query("UPDATE member SET ink = " + restInk + " WHERE roomid = " + roomId + " AND userid = " + userId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+        }
+    });
+}
 
 
 
@@ -110,3 +142,4 @@ module.exports.enterRoom = enterRoom;
 module.exports.favorRoom = favorRoom;
 module.exports.disfavorRoom = disfavorRoom;
 module.exports.useInk = useInk;
+module.exports.update = update;
