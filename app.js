@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
       }
     });
   } else {
-    userID = req.headers.cookie;
+    userID = req.headers.cookie.replace("1st_access=", "");
   }
 
   pool.connect(function (err, client) {
