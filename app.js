@@ -19,10 +19,11 @@ app.get("/", (req, res) => {
   if (req.headers.cookie == undefined) {
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
     userID = res.header.cookie;
+    console.log("if:" + userID);
   } else {
     userID = req.headers.cookie;
+    console.log("else:" + userID);
   }
-  console.log(userID);
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
