@@ -89,8 +89,16 @@ function disfavorRoom(roomId){
     roomList[roomListNo].fav--;
 }
 
-//useInk:指定したルームのメンバーのInkを
+//useInk:指定したルームのメンバーのInkを減らします
 //usedInkAmountはint型で，マイナス値を入力することでインク量を巻き戻します
+function useInk(userId, roomId, usedInkAmount){
+    var roomListNo = getRoomListNo(roomId);
+    prev_amount = roomList[roomListNo].ink.get(userId);
+    next_amount = prev_amount - usedInkAmount;
+    roomList[roomListNo].ink.set(userId, next_amount);
+    return next_amount;
+}
+
 
 
 
@@ -99,3 +107,4 @@ module.exports.getRoom = getRoom;
 module.exports.enterRoom = enterRoom;
 module.exports.favorRoom = favorRoom;
 module.exports.disfavorRoom = disfavorRoom;
+module.exports.useInk = useInk;
