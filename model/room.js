@@ -42,7 +42,7 @@ function newId() {
   return id + 1;
 }
 
-const MAXINK = 100000;
+const MAXINK = 5000;
 //makeRoom():新規テーマ部屋を作ります，DBのroomsとmemberを更新します，ルームIDを返します
 //hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間
 //！！一時的に最大メンバー数を考慮していません！！
@@ -58,8 +58,8 @@ function makeRoom(hostUserId, theme, due) {
       console.log(err);
     } else {
       //templateテーブルから白紙画像のBase64を取得
-      client.query("SELECT img FROM template", function (err, result) {
-        if (err) {
+      client.query("SELECT img FROM template", function(err, result){
+        if(err){
           throw err;
         }
         base64Image = result.rows[0];
@@ -116,7 +116,7 @@ function getRoom(roomId){
 
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
-function enterRoom(userId, roomId, ink) {
+function enterRoom(userId, roomId) {
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
@@ -125,7 +125,7 @@ function enterRoom(userId, roomId, ink) {
       console.log(`userId:${userId}, roomID:${roomId}, ink:${ink}`);
       client.query(
         "INSERT INTO member(ink, roomid, userid) VALUES (" +
-          ink +
+          MAXINK +
           ", " +
           roomId +
           ", " +
@@ -166,19 +166,18 @@ function useInk(userId, roomId, usedInkAmount){
 
 //update():画像とインク量を更新します
 //roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
-function update(roomId, userId, base64Image, restInk) {
-  console.log(
-    `roomID:${roomId}, userID:${userId}, base64image:${base64Image}, restInk:${restInk}`
-  );
+function update(roomId, userId, base64Image, drawlist, restInk) {
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
     } else {
       //roomsテーブル
       client.query(
-        "UPDATE rooms SET img = '" +
-          base64Image +
-          "'::bytea WHERE id = " +
+        "UPDATE rooms SET img = '" + 
+          base64Image + 
+          "'::bytea, drawlist = '" + 
+          drawlist + 
+          "' WHERE id = " + 
           roomId,
         function (err, result) {
           if (err) {
