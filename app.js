@@ -17,6 +17,7 @@ const io = require("./controller/io");
 const server = app.listen(process.env.PORT || port);
 
 app.get("/", (req, res) => {
+  var userID;
   if (req.headers.cookie == undefined) {
     const now = Date.now();
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
