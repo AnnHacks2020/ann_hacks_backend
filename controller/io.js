@@ -15,6 +15,7 @@ function io(server) {
             };
             store[msg.id] = usrobj;
             socket.join(msg.roomid);
+            room.enterRoom(msg.id, msg.roomid, msg.ink);
             console.log(room.enterRoom(msg.id, msg.roomid));
             // 画像を送信 
             socket.broadcast.to(store[msg.id].room).emit('send image'/*, image*/);

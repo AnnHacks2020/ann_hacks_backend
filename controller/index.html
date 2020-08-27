@@ -78,7 +78,8 @@ $(function() {
         socket.emit('join', {
             roomid: 1,
             name: "myname",
-            id: 1
+            id: 1, 
+            ink: 100
         });
         join = 1;
         console.log("join!!");
@@ -87,7 +88,8 @@ $(function() {
         socket.emit('join', {
             roomid: 2,
             name: "myname2",
-            id: 2
+            id: 2, 
+            ink: 100
         });
         join = 2;
         console.log("join2!!");
