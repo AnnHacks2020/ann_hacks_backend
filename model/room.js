@@ -132,7 +132,7 @@ function update(roomId, userId, base64Image, restInk){
         }
         else{
             //roomsテーブル
-            client.query("UPDATE rooms SET img = " + btoa(base64Image) + " WHERE id = " + roomId, function(err, result){
+            client.query("UPDATE rooms SET img = '" + btoa(base64Image) + "'::bytea WHERE id = " + roomId, function(err, result){
                 if(err){
                     throw err;
                 }
