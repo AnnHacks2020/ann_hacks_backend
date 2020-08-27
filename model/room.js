@@ -1,4 +1,5 @@
-var roomList = new Array();
+/************************************************************************************* */
+////var roomList = new Array();
 /*  roomListは，ルームオブジェクトのリストです．
     単一のルームオブジェクトは，以下を要素に持ちます．
 
@@ -13,8 +14,17 @@ var roomList = new Array();
     deadline: 期限日時，具体的には1970/1/1 0:00 からの経過ミリ秒, int
 
  */
+/************************************************************************************* */
 
-const MAXINK = 100000;
+const pg = require("pg");
+const pool = new pg.Pool({
+    host: process.env.ENV_HOST,
+    database: process.env.ENV_DB,
+    user: process.env.ENV_USER,
+    port: 5432,
+    password: process.env.ENV_PASS,
+});
+
 var inc = 0;
 
 function newId(){
@@ -22,39 +32,40 @@ function newId(){
     return inc;
 }
 
-//makeRoom:新規テーマ部屋を作ります
-//hostUserId:作成者ユーザID, theme:テーマ文字列, maxMembers:最大人数, due:期間
-function makeRoom(hostUserId, theme, maxMembers, due){
+//makeRoom():新規テーマ部屋を作ります，DBのroomsとmemberを更新します，ルームIDを返します
+//hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間, base64Image:白紙の画像のbase64, ink:初期インク量
+//！！一時的に最大メンバー数を考慮していません！！
+function makeRoom(hostUserId, theme, due, base64Image, ink){
     var roomId = newId();
-    var image = null;//!NOTICE!白紙を代入したい
-    var fav = 0;
-
-    //member配列の最初に作成者ユーザIDを入れておく//
-    var member = new Array();
-    member.push(hostUserId);
-
-    //ハッシュテーブルinkはメンバーIDをキーとし残りインク量を返します
-    var ink = new Map();
-    ink.set(hostUserId, MAXINK);
 
     //deadlineには期日のIntが入る
     var deadline = Date.now() + due;//!NOTICE!dueの単位がミリ秒である必要があります
+    //注意：データベースのdueには期間ではなく期日が入ります！！
 
-    roomList.push({
-        roomId: roomId,
-        hostUserId: hostUserId,
-        theme: theme,
-        maxMembers: maxMembers,
-        image: image,
-        fav: fav,
-        member: member,
-        ink: ink,
-        deadline: deadline
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //roomsテーブル
+            client.query("INSERT INTO rooms(due, fav, id, img, theme) VALUES (" + deadline + ", 0, " + roomId + ", " + base64Image + ", " + theme + ")", function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+            //memberテーブル
+            client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + hostUserId + ")", function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+        }
     });
 
     return roomId;
 }
 
+/***************************************************************************************
 //getRoomListNo:ルームIDを引数とし，ルームリスト内での配列番号を返します
 function getRoomListNo(roomId){
     return roomList.map(function(e) { return e.roomId; }).indexOf(roomId);
@@ -64,20 +75,29 @@ function getRoomListNo(roomId){
 function getRoom(roomId){
     return roomList[ getRoomListNo(roomId) ];
 }
+*****************************************************************************************/
 
-//enterRoom:ユーザID，ルームIDを引数とし，ルームメンバーにユーザ情報を追加します
-function enterRoom(userId, roomId){
-    var roomListNo = getRoomListNo(roomId);
-    if( roomList[roomListNo].member.length < roomList[roomListNo].maxMembers ){
-        roomList[roomListNo].member.push(userId);
-        roomList[roomListNo].ink.set(userId, MAXINK);
-        return "Admission succeeded.";
-    }
-    else{
-        return "Admission failed: the room is full.";
-    }
+//enterRoom():joinしたメンバー情報でDB:memberを更新します
+//inkは初期インク量
+//！！一時的に最大メンバー数を考慮していません！！
+function enterRoom(userId, roomId, ink){
+ 
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //memberテーブル
+            client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + userId + ")", function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+        }
+    });
 }
 
+/****************************************************************************************
 //favorRoom:指定したルームのfavをインクリメントします
 //disfavorRoom:指定したルームのfavをデクリメントします
 function favorRoom(roomId){
@@ -89,13 +109,47 @@ function disfavorRoom(roomId){
     roomList[roomListNo].fav--;
 }
 
-//useInk:指定したルームのメンバーのInkを
+//useInk:指定したルームのメンバーのInkを減らします
 //usedInkAmountはint型で，マイナス値を入力することでインク量を巻き戻します
+function useInk(userId, roomId, usedInkAmount){
+    var roomListNo = getRoomListNo(roomId);
+    prev_amount = roomList[roomListNo].ink.get(userId);
+    next_amount = prev_amount - usedInkAmount;
+    roomList[roomListNo].ink.set(userId, next_amount);
+    return next_amount;
+}
+******************************************************************************************/
+
+//update():画像とインク量を更新します
+//roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
+function update(roomId, userId, base64Image, restInk){
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //roomsテーブル
+            client.query("UPDATE rooms SET img = " + base64Image + " WHERE id = " + roomId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+            //memberテーブル
+            client.query("UPDATE member SET ink = " + restInk + " WHERE roomid = " + roomId + " AND userid = " + userId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+        }
+    });
+}
 
 
 
 module.exports.makeRoom = makeRoom;
-module.exports.getRoom = getRoom;
+////module.exports.getRoom = getRoom;
 module.exports.enterRoom = enterRoom;
-module.exports.favorRoom = favorRoom;
-module.exports.disfavorRoom = disfavorRoom;
+////module.exports.favorRoom = favorRoom;
+////module.exports.disfavorRoom = disfavorRoom;
+////module.exports.useInk = useInk;
+module.exports.update = update;
