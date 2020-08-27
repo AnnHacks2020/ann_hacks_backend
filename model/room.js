@@ -87,9 +87,9 @@ function makeRoom(hostUserId, theme, due) {
           MAXINK +
           ", " +
           roomId +
-          ", " +
+          ", '" +
           hostUserId +
-          ")",
+          "')",
         function (err, result) {
           if (err) {
             throw err;
@@ -128,9 +128,9 @@ function enterRoom(userId, roomId) {
           MAXINK +
           ", " +
           roomId +
-          ", " +
+          ", '" +
           userId +
-          ")",
+          "')",
         function (err, result) {
           if (err) {
             throw err;
@@ -191,8 +191,9 @@ function update(roomId, userId, base64Image, drawlist, restInk) {
           restInk +
           " WHERE roomid = " +
           roomId +
-          " AND userid = " +
-          userId,
+          " AND userid = '" +
+          userId + 
+          "'",
         function (err, result) {
           if (err) {
             throw err;
