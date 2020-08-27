@@ -88,6 +88,7 @@ function enterRoom(userId, roomId, ink){
         }
         else{
             //memberテーブル
+            console.log(`userId:${userId}, roomID:${roomId}, ink:${ink}`);
             client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + userId + ")", function(err, result){
                 if(err){
                     throw err;
