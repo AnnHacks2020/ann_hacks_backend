@@ -8,7 +8,7 @@ app.get('/', function (req, res) {
     //     room.makeRoom(1, "testmember", 100, 10000000000000);
     //     console.log("made new room.");
     // }
-    room.makeRoom(0, "theme", 10000000, "base64image...", 1000);
+    // room.makeRoom(0, "theme", 10000000, "base64image...", 1000);
     res.sendFile(__dirname + "/index.html");
 });
 
