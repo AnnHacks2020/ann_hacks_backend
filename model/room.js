@@ -17,6 +17,7 @@
 /************************************************************************************* */
 
 const pg = require("pg");
+const { use } = require("../controller/room");
 const pool = new pg.Pool({
     host: process.env.ENV_HOST,
     database: process.env.ENV_DB,
@@ -124,6 +125,7 @@ function useInk(userId, roomId, usedInkAmount){
 //update():画像とインク量を更新します
 //roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
 function update(roomId, userId, base64Image, restInk){
+    console.log(`roomID:${roomId}, userID:${userId}, base64image:${base64Image}, restInk:${restInk}`);
     pool.connect(function (err, client){
         if(err){
             console.log(err);
