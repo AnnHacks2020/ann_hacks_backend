@@ -17,6 +17,7 @@
 /************************************************************************************* */
 
 const pg = require("pg");
+const { use } = require("../controller/room");
 const pool = new pg.Pool({
   host: process.env.ENV_HOST,
   database: process.env.ENV_DB,
@@ -115,6 +116,7 @@ function getRoom(roomId){
 
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
+<<<<<<< HEAD
 function enterRoom(userId, roomId) {
   pool.connect(function (err, client) {
     if (err) {
@@ -133,6 +135,22 @@ function enterRoom(userId, roomId) {
           if (err) {
             throw err;
           }
+=======
+function enterRoom(userId, roomId, ink){
+ 
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //memberテーブル
+            console.log(`userId:${userId}, roomID:${roomId}, ink:${ink}`);
+            client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + userId + ")", function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+>>>>>>> a11563371d9564d5963fcd57604cbaabf843b812
         }
       );
     }
@@ -164,6 +182,7 @@ function useInk(userId, roomId, usedInkAmount){
 
 //update():画像とインク量を更新します
 //roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
+<<<<<<< HEAD
 function update(roomId, userId, base64Image, restInk) {
   pool.connect(function (err, client) {
     if (err) {
@@ -190,6 +209,27 @@ function update(roomId, userId, base64Image, restInk) {
           if (err) {
             throw err;
           }
+=======
+function update(roomId, userId, base64Image, restInk){
+    console.log(`roomID:${roomId}, userID:${userId}, base64image:${base64Image}, restInk:${restInk}`);
+    pool.connect(function (err, client){
+        if(err){
+            console.log(err);
+        }
+        else{
+            //roomsテーブル
+            client.query("UPDATE rooms SET img = '" + base64Image + "'::bytea WHERE id = " + roomId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+            //memberテーブル
+            client.query("UPDATE member SET ink = " + restInk + " WHERE roomid = " + roomId + " AND userid = " + userId, function(err, result){
+                if(err){
+                    throw err;
+                }
+            });
+>>>>>>> a11563371d9564d5963fcd57604cbaabf843b812
         }
       );
     }

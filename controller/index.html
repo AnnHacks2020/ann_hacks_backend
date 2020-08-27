@@ -60,7 +60,7 @@ li {
 <input type="button" id="join2" value="join2" />
 </div>
  
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript">
 $(function() {
@@ -69,16 +69,17 @@ $(function() {
     var fromY;
     var drawFlag = false;
     var context = $("canvas").get(0).getContext('2d');
-    var socket = io.connect('http://localhost:3000');
+    var socket = io.connect('https://obscure-stream-51163.herokuapp.com/');
 
     var join = 0;
 
-    console.log("socket:" + socket);    
+    console.dir("socket:" + socket);    
     $('#join').click(function() {
         socket.emit('join', {
             roomid: 1,
             name: "myname",
-            id: 1
+            id: 1, 
+            ink: 100
         });
         join = 1;
         console.log("join!!");
@@ -87,7 +88,8 @@ $(function() {
         socket.emit('join', {
             roomid: 2,
             name: "myname2",
-            id: 2
+            id: 2, 
+            ink: 100
         });
         join = 2;
         console.log("join2!!");
