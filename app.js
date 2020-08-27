@@ -76,7 +76,6 @@ app.post("/", (req, res) => {
     req.body.theme,
     req.body.due
   );
-  room.enterRoom(req.headers.cookie.replace("1st_access=", ""), ret);
   res.send(ret);
 });
 
