@@ -116,26 +116,6 @@ function getRoom(roomId){
 
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
-<<<<<<< HEAD
-function enterRoom(userId, roomId) {
-  pool.connect(function (err, client) {
-    if (err) {
-      console.log(err);
-    } else {
-      //memberテーブル
-      client.query(
-        "INSERT INTO member(ink, roomid, userid) VALUES (" +
-          MAXINK +
-          ", " +
-          roomId +
-          ", " +
-          userId +
-          ")",
-        function (err, result) {
-          if (err) {
-            throw err;
-          }
-=======
 function enterRoom(userId, roomId, ink){
  
     pool.connect(function (err, client){
@@ -150,7 +130,6 @@ function enterRoom(userId, roomId, ink){
                     throw err;
                 }
             });
->>>>>>> a11563371d9564d5963fcd57604cbaabf843b812
         }
       );
     }
