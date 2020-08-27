@@ -14,6 +14,7 @@ const port = 3000;
 
 const room = require("./controller/room");
 const io = require("./controller/io");
+const server = app.listen(process.env.PORT || port);
 
 app.get("/", (req, res) => {
   if (req.headers.cookie == undefined) {
@@ -40,6 +41,8 @@ app.get("/", (req, res) => {
   } else {
     userID = req.headers.cookie.replace("1st_access=", "");
   }
+
+  app.use("/room");
 
   pool.connect(function (err, client) {
     if (err) {
@@ -77,4 +80,4 @@ app.post("/", (req, res) => {
   res.send(ret);
 });
 
-app.listen(process.env.PORT || port);
+io(server);
