@@ -53,16 +53,16 @@ app.get("/", (req, res) => {
         }
         gallery = result.rows;
       });
-      client.query("SELECT roomid FROM fav WHERE userid=" + userID, function (
-        err,
-        result
-      ) {
-        if (err) {
-          throw err;
+      client.query(
+        "SELECT roomid FROM fav WHERE userid='" + userID + "'",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          favs = result.rows;
+          res.send({ gallery: gallery, favs: favs });
         }
-        favs = result.rows;
-        res.send({ gallery: gallery, favs: favs });
-      });
+      );
     }
   });
 });
