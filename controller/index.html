@@ -73,7 +73,7 @@ $(function() {
 
     var join = 0;
 
-    console.log("socket:" + socket);    
+    console.dir("socket:" + socket);    
     $('#join').click(function() {
         socket.emit('join', {
             roomid: 1,
