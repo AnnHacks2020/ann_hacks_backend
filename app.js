@@ -42,8 +42,6 @@ app.get("/", (req, res) => {
     userID = req.headers.cookie.replace("1st_access=", "");
   }
 
-  app.use("/room", room);
-
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
@@ -70,14 +68,63 @@ app.get("/", (req, res) => {
   });
 });
 
+app.use("/room", room);
+
 app.post("/", (req, res) => {
   ret = room.makeRoom(
     req.headers.cookie.replace("1st_access=", ""),
     req.body.theme,
     req.body.due
   );
-  room.enterRoom(req.headers.cookie.replace("1st_access=", ""), ret);
   res.send(ret);
+});
+
+app.post("/fav", (req, res) => {
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      var already = 0;
+      client.query(
+        "SELECT COUNT(*) FROM fav WHERE roomid = " +
+          roomID +
+          " AND userid = " +
+          userID,
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          already = result.rows[0];
+        }
+      );
+      if (already > 0) {
+        client.query(
+          "DELETE FROM fav WHERE roomid = " +
+            roomID +
+            " AND userid = " +
+            userID,
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+      } else {
+        client.query(
+          "INSERT INTO fav (roomid, userid) VALUES(" +
+            roomID +
+            ", " +
+            userID +
+            ")",
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+      }
+    }
+  });
 });
 
 io(server);
