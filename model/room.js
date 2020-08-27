@@ -41,10 +41,11 @@ function newId() {
   return id + 1;
 }
 
+const MAXINK = 100000;
 //makeRoom():新規テーマ部屋を作ります，DBのroomsとmemberを更新します，ルームIDを返します
-//hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間, base64Image:白紙の画像のbase64, ink:初期インク量
+//hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間
 //！！一時的に最大メンバー数を考慮していません！！
-function makeRoom(hostUserId, theme, due, base64Image, ink) {
+function makeRoom(hostUserId, theme, due) {
   var roomId = newId();
 
   //deadlineには期日のIntが入る
@@ -55,6 +56,13 @@ function makeRoom(hostUserId, theme, due, base64Image, ink) {
     if (err) {
       console.log(err);
     } else {
+      //templateテーブルから白紙画像のBase64を取得
+      client.query("SELECT img FROM template", function(err, result){
+        if(err){
+          throw err;
+        }
+        base64Image = result.rows[0];
+      });
       //roomsテーブル
       client.query(
         "INSERT INTO rooms(due, fav, id, img, theme) VALUES (" +
@@ -75,7 +83,7 @@ function makeRoom(hostUserId, theme, due, base64Image, ink) {
       //memberテーブル
       client.query(
         "INSERT INTO member(ink, roomid, userid) VALUES (" +
-          ink +
+          MAXINK +
           ", " +
           roomId +
           ", " +
@@ -106,9 +114,8 @@ function getRoom(roomId){
 *****************************************************************************************/
 
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
-//inkは初期インク量
 //！！一時的に最大メンバー数を考慮していません！！
-function enterRoom(userId, roomId, ink) {
+function enterRoom(userId, roomId) {
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
@@ -116,7 +123,7 @@ function enterRoom(userId, roomId, ink) {
       //memberテーブル
       client.query(
         "INSERT INTO member(ink, roomid, userid) VALUES (" +
-          ink +
+          MAXINK +
           ", " +
           roomId +
           ", " +
