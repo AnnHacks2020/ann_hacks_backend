@@ -1,3 +1,4 @@
+const http = require("http");
 const express = require("express");
 const pg = require("pg");
 const pool = new pg.Pool({
@@ -14,29 +15,56 @@ const port = 3000;
 const room = require("./controller/room");
 const io = require("./controller/io");
 
-// const server = require('http').Server(app);
-const server = app.listen(process.env.PORT || port);
-
 app.get("/", (req, res) => {
-  // pool.connect(function (err, client) {
-  //   if (err) {
-  //     console.log(err);
-  //   } else {
-  //     client.query("SELECT theme FROM ROOMS", function (err, result) {
-  //       if (err) {
-  //         throw err;
-  //       }
-  //       res.send(result.rows[0].theme);
-  //     });
-  //   }
-  // });
-  res.send("<button onclick=\"location.href='./room'\">room</button>");
-//   res.sendFile(__dirname + "/controller/index.html");
+  console.log(JSON.stringify(req.headers));
+  if (req.headers.cookie == undefined) {
+    const now = Date.now();
+    res.setHeader("Set-Cookie", "1st_access=" + now + ";");
+    userID = now;
+    pool.connect(function (err, client) {
+      if (err) {
+        console.log(err);
+      } else {
+        client.query(
+          {
+            text: "INSERT INTO users(id) VALUES($1)",
+            values: [userID],
+          },
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+            res.send(result.rows[0]);
+          }
+        );
+      }
+    });
+  } else {
+    userID = req.headers.cookie.replace("1st_access=", "");
+  }
+
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query("SELECT theme FROM ROOMS", function (err, result) {
+        if (err) {
+          throw err;
+        }
+        res.send("Welcome " + userID + result.rows[0].theme);
+      });
+    }
+  });
 });
 
-app.use("/room", room)
+app.post("/", (req, res) => {
+  ret = room.makeRoom(
+    req.headers.cookie.replace("1st_access=", ""),
+    req.body.theme,
+    req.body.due
+  );
+  room.enterRoom(req.headers.cookie.replace("1st_access=", ""), ret);
+  res.send(ret);
+});
 
-console.log(process.env.ENV_DB, process.env.ENV_USER);
-// var server = app.listen(process.env.PORT || port);
-io(server);
-// server.listen(process.env.PORT || port);
+app.listen(process.env.PORT || port);

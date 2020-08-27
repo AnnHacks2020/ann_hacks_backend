@@ -18,51 +18,79 @@
 
 const pg = require("pg");
 const pool = new pg.Pool({
-    host: process.env.ENV_HOST,
-    database: process.env.ENV_DB,
-    user: process.env.ENV_USER,
-    port: 5432,
-    password: process.env.ENV_PASS,
+  host: process.env.ENV_HOST,
+  database: process.env.ENV_DB,
+  user: process.env.ENV_USER,
+  port: 5432,
+  password: process.env.ENV_PASS,
 });
 
-var inc = 0;
-
-function newId(){
-    inc++;
-    return inc;
+function newId() {
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      client.query("SELECT COUNT(*) FROM rooms", function (err, result) {
+        if (err) {
+          throw err;
+        }
+        id = result.rows[0];
+      });
+    }
+  });
+  return id + 1;
 }
 
 //makeRoom():新規テーマ部屋を作ります，DBのroomsとmemberを更新します，ルームIDを返します
 //hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間, base64Image:白紙の画像のbase64, ink:初期インク量
 //！！一時的に最大メンバー数を考慮していません！！
-function makeRoom(hostUserId, theme, due, base64Image, ink){
-    var roomId = newId();
+function makeRoom(hostUserId, theme, due, base64Image, ink) {
+  var roomId = newId();
 
-    //deadlineには期日のIntが入る
-    var deadline = Date.now() + due;//!NOTICE!dueの単位がミリ秒である必要があります
-    //注意：データベースのdueには期間ではなく期日が入ります！！
+  //deadlineには期日のIntが入る
+  var deadline = Date.now() + due; //!NOTICE!dueの単位がミリ秒である必要があります
+  //注意：データベースのdueには期間ではなく期日が入ります！！
 
-    pool.connect(function (err, client){
-        if(err){
-            console.log(err);
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      //roomsテーブル
+      client.query(
+        "INSERT INTO rooms(due, fav, id, img, theme) VALUES (" +
+          deadline +
+          ", 0, " +
+          roomId +
+          ", " +
+          base64Image +
+          ", " +
+          theme +
+          ")",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
         }
-        else{
-            //roomsテーブル
-            client.query("INSERT INTO rooms(due, fav, id, img, theme) VALUES (" + deadline + ", 0, " + roomId + ", " + base64Image + ", " + theme + ")", function(err, result){
-                if(err){
-                    throw err;
-                }
-            });
-            //memberテーブル
-            client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + hostUserId + ")", function(err, result){
-                if(err){
-                    throw err;
-                }
-            });
+      );
+      //memberテーブル
+      client.query(
+        "INSERT INTO member(ink, roomid, userid) VALUES (" +
+          ink +
+          ", " +
+          roomId +
+          ", " +
+          hostUserId +
+          ")",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
         }
-    });
+      );
+    }
+  });
 
-    return roomId;
+  return roomId;
 }
 
 /***************************************************************************************
@@ -80,21 +108,28 @@ function getRoom(roomId){
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //inkは初期インク量
 //！！一時的に最大メンバー数を考慮していません！！
-function enterRoom(userId, roomId, ink){
- 
-    pool.connect(function (err, client){
-        if(err){
-            console.log(err);
+function enterRoom(userId, roomId, ink) {
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      //memberテーブル
+      client.query(
+        "INSERT INTO member(ink, roomid, userid) VALUES (" +
+          ink +
+          ", " +
+          roomId +
+          ", " +
+          userId +
+          ")",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
         }
-        else{
-            //memberテーブル
-            client.query("INSERT INTO member(ink, roomid, userid) VALUES (" + ink + ", " + roomId + ", " + userId + ")", function(err, result){
-                if(err){
-                    throw err;
-                }
-            });
-        }
-    });
+      );
+    }
+  });
 }
 
 /****************************************************************************************
@@ -122,29 +157,37 @@ function useInk(userId, roomId, usedInkAmount){
 
 //update():画像とインク量を更新します
 //roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
-function update(roomId, userId, base64Image, restInk){
-    pool.connect(function (err, client){
-        if(err){
-            console.log(err);
+function update(roomId, userId, base64Image, restInk) {
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      //roomsテーブル
+      client.query(
+        "UPDATE rooms SET img = " + base64Image + " WHERE id = " + roomId,
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
         }
-        else{
-            //roomsテーブル
-            client.query("UPDATE rooms SET img = " + base64Image + " WHERE id = " + roomId, function(err, result){
-                if(err){
-                    throw err;
-                }
-            });
-            //memberテーブル
-            client.query("UPDATE member SET ink = " + restInk + " WHERE roomid = " + roomId + " AND userid = " + userId, function(err, result){
-                if(err){
-                    throw err;
-                }
-            });
+      );
+      //memberテーブル
+      client.query(
+        "UPDATE member SET ink = " +
+          restInk +
+          " WHERE roomid = " +
+          roomId +
+          " AND userid = " +
+          userId,
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
         }
-    });
+      );
+    }
+  });
 }
-
-
 
 module.exports.makeRoom = makeRoom;
 ////module.exports.getRoom = getRoom;
