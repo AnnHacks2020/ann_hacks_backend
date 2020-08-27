@@ -16,7 +16,6 @@ const room = require("./controller/room");
 const io = require("./controller/io");
 
 app.get("/", (req, res) => {
-  console.log(JSON.stringify(req.headers));
   if (req.headers.cookie == undefined) {
     const now = Date.now();
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
@@ -34,7 +33,6 @@ app.get("/", (req, res) => {
             if (err) {
               throw err;
             }
-            res.send(result.rows[0]);
           }
         );
       }
@@ -47,11 +45,23 @@ app.get("/", (req, res) => {
     if (err) {
       console.log(err);
     } else {
-      client.query("SELECT theme FROM ROOMS", function (err, result) {
+      var gallery;
+      var favs;
+      client.query("SELECT theme, img, fav FROM ROOMS", function (err, result) {
         if (err) {
           throw err;
         }
-        res.send("Welcome " + userID + result.rows[0].theme);
+        gallery = result.rows;
+      });
+      client.query("SELECT roomid FROM fav WHERE userid=" + userID, function (
+        err,
+        result
+      ) {
+        if (err) {
+          throw err;
+        }
+        favs = result.rows;
+        res.send({ gallery: gallery, favs: favs });
       });
     }
   });
