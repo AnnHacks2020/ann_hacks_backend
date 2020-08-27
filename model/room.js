@@ -71,9 +71,9 @@ function makeRoom(hostUserId, theme, due) {
           roomId +
           ", " +
           base64Image +
-          ", " +
+          ", '" +
           theme +
-          ")",
+          "')",
         function (err, result) {
           if (err) {
             throw err;
