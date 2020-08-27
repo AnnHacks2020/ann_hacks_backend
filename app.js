@@ -42,8 +42,6 @@ app.get("/", (req, res) => {
     userID = req.headers.cookie.replace("1st_access=", "");
   }
 
-  app.use("/room", room);
-
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
@@ -69,6 +67,8 @@ app.get("/", (req, res) => {
     }
   });
 });
+
+app.use("/room", room);
 
 app.post("/", (req, res) => {
   ret = room.makeRoom(
