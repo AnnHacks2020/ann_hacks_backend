@@ -31,7 +31,7 @@ function io(server) {
         socket.on('server send', function (msg) {
             // 自分以外の全員に送る
             // io.to(store[msg.id].room).emit('send user', msg); //こちらだと自分にも送られる
-            room.update(msg.roomid, msg.id, "base64image", "99");
+            room.update(msg.roomid, msg.id, "base64imageimage", "99");
             socket.broadcast.to(store[msg.id].room).emit('send user', msg);
         });
     
