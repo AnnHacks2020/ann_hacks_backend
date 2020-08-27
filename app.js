@@ -1,5 +1,7 @@
+import cors from "cors";
 const http = require("http");
 const express = require("express");
+app.use(cors({ origin: true, credentials: true }));
 const pg = require("pg");
 const pool = new pg.Pool({
   host: process.env.ENV_HOST,
