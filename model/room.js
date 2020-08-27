@@ -164,14 +164,19 @@ function useInk(userId, roomId, usedInkAmount){
 
 //update():画像とインク量を更新します
 //roomId:ルームID, userId:描画者のID, base64Image:書き換わった画像のbase64, restInk:残りインク量
-function update(roomId, userId, base64Image, restInk) {
+function update(roomId, userId, base64Image, drawlist, restInk) {
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
     } else {
       //roomsテーブル
       client.query(
-        "UPDATE rooms SET img = " + base64Image + " WHERE id = " + roomId,
+        "UPDATE rooms SET img = " + 
+          base64Image + 
+          ", drawlist = '" + 
+          drawlist + 
+          "' WHERE id = " + 
+          roomId,
         function (err, result) {
           if (err) {
             throw err;
