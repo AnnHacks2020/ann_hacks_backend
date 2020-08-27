@@ -69,7 +69,7 @@ $(function() {
     var fromY;
     var drawFlag = false;
     var context = $("canvas").get(0).getContext('2d');
-    var socket = io.connect('https://obscure-stream-51163.herokuapp.com/');
+    var socket = io();
 
     var join = 0;
 
