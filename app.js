@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
     userID = req.headers.cookie.replace("1st_access=", "");
   }
 
-  app.use("/room");
+  app.use("/room", room);
 
   pool.connect(function (err, client) {
     if (err) {
