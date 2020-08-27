@@ -57,7 +57,7 @@ app.get("/", (req, res) => {
         gallery = result.rows;
       });
       client.query(
-        "SELECT roomid FROM fav WHERE userid='" + userID + "'",
+        "SELECT roomid FROM fav WHERE userid='" + Number(userID) + "'",
         function (err, result) {
           if (err) {
             throw err;
