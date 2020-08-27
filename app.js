@@ -79,4 +79,52 @@ app.post("/", (req, res) => {
   res.send(ret);
 });
 
+app.post("/fav", (req, res) => {
+  pool.connect(function (err, client) {
+    if (err) {
+      console.log(err);
+    } else {
+      var already = 0;
+      client.query(
+        "SELECT COUNT(*) FROM fav WHERE roomid = " +
+          roomID +
+          " AND userid = " +
+          userID,
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          already = result.rows[0];
+        }
+      );
+      if (already > 0) {
+        client.query(
+          "DELETE FROM fav WHERE roomid = " +
+            roomID +
+            " AND userid = " +
+            userID,
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+      } else {
+        client.query(
+          "INSERT INTO fav (roomid, userid) VALUES(" +
+            roomID +
+            ", " +
+            userID +
+            ")",
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+      }
+    }
+  });
+});
+
 io(server);
