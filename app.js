@@ -21,7 +21,7 @@ app.get("/", (req, res) => {
   if (req.headers.cookie == undefined) {
     const now = Date.now();
     res.setHeader("Set-Cookie", "1st_access=" + now + ";");
-    userID = String(now);
+    userID = now;
     pool.connect(function (err, client) {
       if (err) {
         console.log(err);
@@ -56,16 +56,16 @@ app.get("/", (req, res) => {
         gallery = result.rows;
       });
       // お気に入りしたroom一覧を取得
-      client.query("SELECT roomid FROM fav WHERE userid=" + userID, function (
-        err,
-        result
-      ) {
-        if (err) {
-          throw err;
+      client.query(
+        "SELECT roomid FROM fav WHERE userid='" + userID + "'",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          favs = result.rows;
+          res.send({ gallery: gallery, favs: favs });
         }
-        favs = result.rows;
-        res.send({ gallery: gallery, favs: favs });
-      });
+      );
     }
   });
 });
