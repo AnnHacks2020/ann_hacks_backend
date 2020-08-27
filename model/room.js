@@ -41,7 +41,7 @@ function newId() {
   return id + 1;
 }
 
-const MAXINK = 100000;
+const MAXINK = 5000;
 //makeRoom():新規テーマ部屋を作ります，DBのroomsとmemberを更新します，ルームIDを返します
 //hostUserId:作成者ユーザID, theme:テーマ文字列, due:期間
 //！！一時的に最大メンバー数を考慮していません！！
