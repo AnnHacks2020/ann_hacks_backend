@@ -29,7 +29,7 @@ function io(server) {
             (async (msg) => {
             console.log('スタート');
             ret_data = room.enterRoom(msg.userId, msg.roomId);
-            await sleep(1000);
+            await sleep(2000);
             //最初の座標とタグのリスト(drawlist)とインク量
             console.log("ret_data:" + ret_data);
             socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
