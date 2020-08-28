@@ -38,9 +38,11 @@ function io(server) {
 
             const promise = new Promise((resolve, reject) => {
                 ret_data = room.enterRoom(msg.userId, msg.roomId);
+                console.log("ret_data:" + ret_data);
                 resolve(ret_data);
             });
             promise.then((value) => {
+                console.log("ret_data(value):" + value);
                 socket.broadcast.to(store[msg.userId].room).emit('send user init', value);
             })
 
