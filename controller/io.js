@@ -34,7 +34,7 @@ function io(server) {
             console.log("ret_data:" + ret_data);
             socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
             console.log('1秒経ってる!')
-            })();
+            })(msg);
 
             // const promise = new Promise((resolve, reject) => {
             //     ret_data = room.enterRoom(msg.userId, msg.roomId);
