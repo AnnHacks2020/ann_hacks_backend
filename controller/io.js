@@ -24,7 +24,7 @@ function io(server) {
             };
             store[msg.userId] = usrobj;
             socket.join(msg.roomId);
-            ret_data = room.enterRoom(String(msg.userId), msg.roomId);
+            ret_data = room.enterRoom(msg.userId, msg.roomId);
              //最初の座標とタグのリスト(drawlist)とインク量
             console.log(ret_data);
             socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);

@@ -222,8 +222,8 @@ window.addEventListener('load', () => {
   initColorPalette();
   initConfigOfLineWidth();
 
-  let userId = 000;
-  let roomId = 000;
+  let userId = 1;
+  let roomId = 1;
   //let restInk = 000;
 
   // クライアントからサーバーへの接続要求
