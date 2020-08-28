@@ -30,12 +30,15 @@ function io(server) {
             console.log('スタート');
             ret_data = room.enterRoom(msg.userId, msg.roomId);
             await sleep(1000);
+            //最初の座標とタグのリスト(drawlist)とインク量
+            console.log("ret_data:" + ret_data);
+            socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
             console.log('1秒経ってる!')
             })();
             // ret_data = room.enterRoom(msg.userId, msg.roomId);
-             //最初の座標とタグのリスト(drawlist)とインク量
-            console.log(ret_data);
-            socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
+            //  //最初の座標とタグのリスト(drawlist)とインク量
+            // console.log(ret_data);
+            // socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
         });
 
         // クライアントからメッセージ受信
