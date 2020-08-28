@@ -149,7 +149,7 @@ function enterRoom(userId, roomId) {
         }
         console.log("result:" + result);
         console.log("result.rows:" + result.rows);
-        user_in_this_room = result.rows.indexOf(userId);
+        user_in_this_room = result.rows.userId.indexOf(userId);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
 
