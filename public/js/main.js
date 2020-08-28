@@ -238,11 +238,6 @@ window.addEventListener('load', () => {
     // inkVolumne = msg.restInk; d
   });
 
-
-  socket.on('send user fix', function (drawlist) {
-    fixImageLoad(JSON.parse(drawlist))
-  });
-
   socket.on('send user fix to base64', function (drawlist) {
     fixImageLoad(drawlist)
     socket.emit('server send base64', { base64: canvas.toDataURL(), roomId: roomId, userId: userId, restInk: inkVolume - imageTag, json_drawlist: JSON.stringify(drawlist) });
