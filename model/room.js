@@ -114,6 +114,23 @@ function getRoom(roomId){
 }
 *****************************************************************************************/
 
+//冗長性を図るため，ルームのdrawlistを取得するだけの関数を用意しました
+function getDrawlist(roomId){
+  pool.connect(function(err, client){
+    if(err){
+      console.log(err);
+    }else{
+      client.query("SELECT drawlist FROM rooms WHERE id = " + roomId, function(err, result){
+        if(err){
+          throw err;
+        }
+        return result.rows[0];
+      })
+    }
+  })
+}
+
+
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
 function enterRoom(userId, roomId) {
@@ -121,22 +138,54 @@ function enterRoom(userId, roomId) {
     if (err) {
       console.log(err);
     } else {
-      //memberテーブル
-      console.log(`userId:${userId}, roomID:${roomId}, ink:${ink}`);
-      client.query(
-        "INSERT INTO member(ink, roomid, userid) VALUES (" +
-          MAXINK +
-          ", " +
-          roomId +
-          ", '" +
-          userId +
-          "')",
-        function (err, result) {
+
+      //過去に入室したことがあるかどうかを調べます，具体的には
+      //指定したルームにいる人全員のユーザIDを取得して，引数のものと一致するものがあるか調べます
+      var user_in_this_room;
+      client.query("SELECT userid FROM member WHERE roomid = " + roomId, function (err, result) {
+        if (err) {
+          throw err;
+        }
+        user_in_this_room = result.rows.indexOf(userId);
+        //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
+      });
+
+      //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
+      if(user_in_this_room === -1){
+        client.query(
+          "INSERT INTO member(ink, roomid, userid) VALUES (" +
+            MAXINK +
+            ", " +
+            roomId +
+            ", '" +
+            userId +
+            "')",
+          function (err, result) {
+            if (err) {
+              throw err;
+            }
+          }
+        );
+        return {
+          drawlist: getDrawlist(roomId), 
+          ink: MAXINK
+        };
+      }
+      else{//過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
+        var restInk;
+        client.query("SELECT ink FROM member WHERE roomid = " + roomId + " AND userid = '" + userId + "'", function (err, result) {
           if (err) {
             throw err;
           }
-        }
-      );
+          restInk = result.rows[0];
+        });
+        return {
+          drawlist: getDrawlist(roomId),
+          ink: restInk
+        };
+      }
+
+
     }
   });
 }
@@ -206,6 +255,7 @@ function update(roomId, userId, base64Image, drawlist, restInk) {
 
 module.exports.makeRoom = makeRoom;
 ////module.exports.getRoom = getRoom;
+module.exports.getDrawlist = getDrawlist;
 module.exports.enterRoom = enterRoom;
 ////module.exports.favorRoom = favorRoom;
 ////module.exports.disfavorRoom = disfavorRoom;
