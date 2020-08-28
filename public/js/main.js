@@ -240,17 +240,17 @@ window.addEventListener('load', () => {
 
 
   socket.on('send user fix', function (drawlist) {
-    fixImageLoad(JSON.parse(msg.drawlist))
+    fixImageLoad(JSON.parse(drawlist))
   });
 
   socket.on('send user fix to base64', function (drawlist) {
-    fixImageLoad(drawlist);
+    fixImageLoad(JSON.parse(drawlist))
     socket.emit('server send base64', { base64: canvas.toDataURL(), roomID: roomID, userID: userID, restInk: inkVolume - imageTag, json_drawlist: JSON.stringify(drawlist) });
 
   });
 
   socket.on('send user fix', function (drawlist) {
-    fixImageLoad(drawlist);
+    fixImageLoad(JSON.parse(drawlist))
   });
 
   function fixImageLoad(drawlist) {
