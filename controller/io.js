@@ -17,16 +17,17 @@ function io(server) {
 
     io.on('connection', function (socket) {
         console.log("connection");
-        socket.on('join', function (msg) {
+        socket.on('server send init', function (msg) {
+            console.log(msg);
             usrobj = {
                 'room': msg.roomId,
             };
             store[msg.userId] = usrobj;
             socket.join(msg.roomId);
-            room.enterRoom(msg.userId, msg.roomId, msg.ink);
-            // console.log(room.enterRoom(msg.id, msg.roomid));
-            // 画像を送信 
-            socket.broadcast.to(store[msg.userId].room).emit('send image'/*, room.*/);  //最初の座標とタグのリスト(drawlist)とインク量
+            ret_data = room.enterRoom(msg.userId, msg.roomId);
+             //最初の座標とタグのリスト(drawlist)とインク量
+            console.log(ret_data);
+            socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
         });
 
         // クライアントからメッセージ受信
@@ -37,7 +38,7 @@ function io(server) {
         // });
         // クライアントからメッセージ受信
         // 確定した座標データの受け取り
-        socket.on('server send base64', function (msg) {
+        socket.on('server send fix', function (msg) {
             // 自分以外の全員に送る
             // io.to(store[msg.id].room).emit('send user', msg); //こちらだと自分にも送られる
 
@@ -45,12 +46,28 @@ function io(server) {
             tagStack.push(pointStack.length);
             //socket.broadcast.emit('send user fix', { points: pointStack, tags: tagStack });
             drawlist = { points: pointStack, tags: tagStack };
-            json_drawlist = JSON.stringify(drawlist);
-            console.log(json_drawlist);
-            drawlist = JSON.parse(json_drawlist);
+            // json_drawlist = JSON.stringify(drawlist);
+            // console.log(json_drawlist);
+            // drawlist = JSON.parse(json_drawlist);
 
-            room.update(msg.roomId, msg.userId, msg.base64, json_drawlist, msg.restInk);
-            socket.broadcast.to(store[msg.userId].room).emit('send user fix', drawlist);
+            // room.update(msg.roomId, msg.userId, msg.base64, json_drawlist, msg.restInk);
+            // socket.broadcast.to(store[msg.userId].room).emit('send user fix', drawlist);
+            socket.emit('send user fix to base64', drawlist);  // 画像を生成してもらう
+            socket.broadcast.emit('send user fix', drawlist); // 他ユーザに描画
+        });
+
+        socket.on('server send base64', function (msg) {
+            // 自分以外の全員に送る
+            // console.log("server send base64:" + typeof (msg.base64));
+            // console.log("server send drawlist:" + typeof (msg.json_drawlist));
+            // console.log("server send userID:" + msg.userID);
+            // console.log("server send roomID:" + msg.roomID);
+            // console.log("server send restInk:" + msg.restInk);
+
+            room.update(msg.roomId, msg.userId, msg.base64, msg.json_drawlist, msg.restInk);
+    
+            //drawlist = JSON.parse(json_drawlist);
+            //base64とroomID,pointTags,インク量,ユーザID
         });
     
         // 切断 (この項目の必要性不明)
