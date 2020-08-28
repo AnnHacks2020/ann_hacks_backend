@@ -22,6 +22,7 @@ window.addEventListener('load', () => {
   let pointStack = [];
   let pointArray = [];
   var imageTag = 0;
+  let inkVolume = 5000;
   let fixImageData = context.createImageData(canvas.width, canvas.height);
 
   function fixImage(tag_a, tag_b) {
@@ -63,7 +64,7 @@ window.addEventListener('load', () => {
     // 元に戻す配列の先頭からイメージデータを取得して
     imageTag = undoTagStack.shift();
     // 描画する
-    document.getElementById("area1").innerText = "インク量：" + Math.round(imageTag);
+    document.getElementById("area1").innerText = "インク残量：" + Math.round(inkVolume - imageTag);
     imageLoad();
   }
 
@@ -75,7 +76,7 @@ window.addEventListener('load', () => {
     // やり直す配列の先頭からイメージデータを取得して
     imageTag = redoTagStack.shift();
     // 描画する
-    document.getElementById("area1").innerText = "インク量：" + Math.round(imageTag);
+    document.getElementById("area1").innerText = "インク残量：" + Math.round(inkVolume - imageTag);
     imageLoad();
   }
 
@@ -84,7 +85,7 @@ window.addEventListener('load', () => {
       return;
     }
     imageTag = pointStack.length;
-    document.getElementById("area1").innerText = "インク量：" + Math.round(imageTag);
+    document.getElementById("area1").innerText = "インク残量：" + Math.round(inkVolume - imageTag);
   }
 
   function imageLoad() {
@@ -193,16 +194,6 @@ window.addEventListener('load', () => {
       inkVolumeUpdate();
       showLineWidthIndicator(event.layerX, event.layerY);
     });
-    layeredCanvasArea.addEventListener('touchdown', dragStart);
-    layeredCanvasArea.addEventListener('touchup', dragEnd);
-    layeredCanvasArea.addEventListener('touchout', dragEnd);
-    layeredCanvasArea.addEventListener('touchmove', event => {
-
-      event.preventDefault();
-      draw(event.layerX, event.layerY);
-      inkVolumeUpdate();
-      showLineWidthIndicator(event.layerX, event.layerY);
-    });
   }
 
   function initColorPalette() {
@@ -231,20 +222,42 @@ window.addEventListener('load', () => {
   initColorPalette();
   initConfigOfLineWidth();
 
+  let userID = 000;
+  let roomID = 000;
+  //let restInk = 000;
+
   // クライアントからサーバーへの接続要求
   const socket = io.connect();
   // 接続時の処理
   socket.on("connect", () => {
-    console.log("connect");
-    socket.emit('server send init');
+    socket.emit('server send init', { userID: userID, roomID: roomID });
   });
 
-  socket.on('send user fix', function (msg) {
+  socket.on('send user init', function (msg) {
+    fixImageLoad(JSON.parse(msg.drawlist))
+    // inkVolumne = msg.restInk; 
+  });
 
+
+  socket.on('send user fix', function (drawlist) {
+    fixImageLoad(JSON.parse(msg.drawlist))
+  });
+
+  socket.on('send user fix to base64', function (drawlist) {
+    fixImageLoad(drawlist);
+    socket.emit('server send base64', { base64: canvas.toDataURL(), roomID: roomID, userID: userID, restInk: inkVolume - imageTag, json_drawlist: JSON.stringify(drawlist) });
+
+  });
+
+  socket.on('send user fix', function (drawlist) {
+    fixImageLoad(drawlist);
+  });
+
+  function fixImageLoad(drawlist) {
     context.clearRect(0, 0, canvas.width, canvas.height);
 
-    let fixPoints = msg.points;
-    let fixTags = msg.tags;
+    let fixPoints = drawlist.points;
+    let fixTags = drawlist.tags;
 
     let x_s = null;
     let y_s = null;
@@ -274,83 +287,6 @@ window.addEventListener('load', () => {
 
     fixImageData = context.getImageData(0, 0, canvas.width, canvas.height);
     imageLoad();
-
-  });
-
-  socket.on('send user fix to base64', function (msg) {
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    let fixPoints = msg.points;
-    let fixTags = msg.tags;
-
-    let x_s = null;
-    let y_s = null;
-    for (let i = 0; i < fixPoints.length; i++) {
-      context.lineCap = 'round';
-      context.lineJoin = 'round';
-      context.strokeStyle = fixPoints[i][3];
-      context.lineWidth = fixPoints[i][2];
-      context.beginPath();
-      if (x_s === null || y_s === null) {
-        context.moveTo(fixPoints[i][0], fixPoints[i][1]);
-      } else {
-        context.moveTo(x_s, y_s);
-      }
-      context.lineTo(fixPoints[i][0], fixPoints[i][1]);
-      context.stroke();
-      context.closePath();
-
-      x_s = fixPoints[i][0];
-      y_s = fixPoints[i][1];
-
-      if (fixTags.includes(i + 1)) {
-        x_s = null;
-        y_s = null;
-      }
-    }
-
-    fixImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    socket.emit('server send base64', canvas.toDataURL());
-    imageLoad();
-  });
-
-  socket.on('send user fix', function (msg) {
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    let fixPoints = msg.points;
-    let fixTags = msg.tags;
-
-    let x_s = null;
-    let y_s = null;
-    for (let i = 0; i < fixPoints.length; i++) {
-      context.lineCap = 'round';
-      context.lineJoin = 'round';
-      context.strokeStyle = fixPoints[i][3];
-      context.lineWidth = fixPoints[i][2];
-      context.beginPath();
-      if (x_s === null || y_s === null) {
-        context.moveTo(fixPoints[i][0], fixPoints[i][1]);
-      } else {
-        context.moveTo(x_s, y_s);
-      }
-      context.lineTo(fixPoints[i][0], fixPoints[i][1]);
-      context.stroke();
-      context.closePath();
-
-      x_s = fixPoints[i][0];
-      y_s = fixPoints[i][1];
-
-      if (fixTags.includes(i + 1)) {
-        x_s = null;
-        y_s = null;
-      }
-    }
-
-    fixImageData = context.getImageData(0, 0, canvas.width, canvas.height);
-    imageLoad();
-
-  });
+  }
 
 });
