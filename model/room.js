@@ -154,46 +154,46 @@ function enterRoom(userId, roomId) {
         user_in_this_room = userlist.indexOf(userId);
         console.log("user_in_this_room in else sentence:" + user_in_this_room);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
-      });
+    //   });
 
-      console.log("user_in_this_room:" + user_in_this_room);
-      //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
-      if(user_in_this_room === -1){
-        client.query(
-          "INSERT INTO member(ink, roomid, userid) VALUES (" +
-            MAXINK +
-            ", " +
-            roomId +
-            ", '" +
-            userId +
-            "')",
-          function (err, result) {
-            if (err) {
-              throw err;
+        console.log("user_in_this_room:" + user_in_this_room);
+        //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
+        if(user_in_this_room === -1){
+            client.query(
+            "INSERT INTO member(ink, roomid, userid) VALUES (" +
+                MAXINK +
+                ", " +
+                roomId +
+                ", '" +
+                userId +
+                "')",
+            function (err, result) {
+                if (err) {
+                throw err;
+                }
             }
-          }
-        );
-        console.log("new room:" + getDrawlist(roomId));
-        return {
-          drawlist: getDrawlist(roomId), 
-          ink: MAXINK
-        };
-      }
-      else{//過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
-        var restInk;
-        client.query("SELECT ink FROM member WHERE roomid = " + roomId + " AND userid = '" + userId + "'", function (err, result) {
-          if (err) {
-            throw err;
-          }
-          restInk = result.rows[0].ink;
-        });
-        console.log("existed room:" + getDrawlist(roomId));
-        return {
-          drawlist: getDrawlist(roomId),
-          ink: restInk
-        };
-      }
-
+            );
+            console.log("new room:" + getDrawlist(roomId));
+            return {
+            drawlist: getDrawlist(roomId), 
+            ink: MAXINK
+            };
+        }
+        else{//過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
+            var restInk;
+            client.query("SELECT ink FROM member WHERE roomid = " + roomId + " AND userid = '" + userId + "'", function (err, result) {
+            if (err) {
+                throw err;
+            }
+            restInk = result.rows[0].ink;
+            });
+            console.log("existed room:" + getDrawlist(roomId));
+            return {
+            drawlist: getDrawlist(roomId),
+            ink: restInk
+            };
+        }
+    });
 
     }
   });
