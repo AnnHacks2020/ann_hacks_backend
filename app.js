@@ -58,7 +58,10 @@ app.get("/", (req, res) => {
     } else {
       var gallery;
       var favs;
-      client.query("SELECT theme, img, fav FROM ROOMS", function (err, result) {
+      client.query("SELECT id, theme, img, fav FROM ROOMS", function (
+        err,
+        result
+      ) {
         if (err) {
           throw err;
         }
