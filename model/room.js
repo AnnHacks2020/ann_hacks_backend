@@ -147,8 +147,8 @@ function enterRoom(userId, roomId) {
         if (err) {
           throw err;
         }
-        console.log("result:" + result);
-        console.log("result.rows:" + result.rows);
+        console.dir("result:" + result);
+        console.dir("result.rows:" + result.rows);
         user_in_this_room = result.rows.userId.indexOf(userId);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
