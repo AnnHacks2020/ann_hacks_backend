@@ -43,7 +43,7 @@ function io(server) {
             });
             promise.then((value) => {
                 console.log("ret_data(value):" + value);
-                socket.broadcast.to(store[msg.userId].room).emit('send user init', value);
+                socket.to(store[msg.userId].room).emit('send user init', value);
             })
 
             // ret_data = room.enterRoom(msg.userId, msg.roomId);
