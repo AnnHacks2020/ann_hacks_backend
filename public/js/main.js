@@ -227,7 +227,7 @@ window.addEventListener('load', () => {
   //let restInk = 000;
 
   // クライアントからサーバーへの接続要求
-  const socket = io.connect("http://localhost:3000");
+  const socket = io.connect();
   // 接続時の処理
   socket.on("connect", () => {
     console.dir({ userId: userId, roomId: roomId });
