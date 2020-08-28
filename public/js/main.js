@@ -235,6 +235,7 @@ window.addEventListener('load', () => {
   });
 
   socket.on('send user init', function (msg) {
+    console.dir(msg);
     fixImageLoad(msg.drawlist)
     // inkVolumne = msg.restInk; 
   });
