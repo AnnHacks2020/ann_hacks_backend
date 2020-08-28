@@ -184,7 +184,7 @@ function enterRoom(userId, roomId) {
                       throw err;
                     }
                     // console.log(JSON.stringify(result));
-                    // console.log(JSON.stringify(result.rows[0].drawlist));
+                    console.log(JSON.stringify(result.rows[0].drawlist));
                     return {
                         drawlist: result.rows[0].drawlist, 
                         ink: MAXINK
