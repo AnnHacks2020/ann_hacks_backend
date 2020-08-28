@@ -222,32 +222,30 @@ window.addEventListener('load', () => {
   initColorPalette();
   initConfigOfLineWidth();
 
-  let userId = 1;
-  let roomId = 1;
+  let userID = 000;
+  let roomID = 000;
   //let restInk = 000;
 
   // クライアントからサーバーへの接続要求
   const socket = io.connect();
   // 接続時の処理
   socket.on("connect", () => {
-    console.dir({ userId: userId, roomId: roomId });
-    socket.emit('server send init', { userId: userId, roomId: roomId });
+    socket.emit('server send init', { userID: userID, roomID: roomID });
   });
 
   socket.on('send user init', function (msg) {
-    console.dir(msg);
-    fixImageLoad(msg.drawlist)
+    fixImageLoad(JSON.parse(msg.drawlist))
     // inkVolumne = msg.restInk; 
   });
 
 
   socket.on('send user fix', function (drawlist) {
-    fixImageLoad(drawlist);
+    fixImageLoad(JSON.parse(msg.drawlist))
   });
 
   socket.on('send user fix to base64', function (drawlist) {
     fixImageLoad(drawlist);
-    socket.emit('server send base64', { base64: canvas.toDataURL(), roomId: roomId, userId: userId, restInk: inkVolume - imageTag, json_drawlist: JSON.stringify(drawlist) });
+    socket.emit('server send base64', { base64: canvas.toDataURL(), roomID: roomID, userID: userID, restInk: inkVolume - imageTag, json_drawlist: JSON.stringify(drawlist) });
 
   });
 
