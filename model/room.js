@@ -58,8 +58,8 @@ function makeRoom(hostUserId, theme, due) {
       console.log(err);
     } else {
       //templateテーブルから白紙画像のBase64を取得
-      client.query("SELECT img FROM template", function(err, result){
-        if(err){
+      client.query("SELECT img FROM template", function (err, result) {
+        if (err) {
           throw err;
         }
         base64Image = result.rows[0].img;
@@ -115,108 +115,126 @@ function getRoom(roomId){
 *****************************************************************************************/
 
 //冗長性を図るため，ルームのdrawlistを取得するだけの関数を用意しました
-function getDrawlist(roomId){
-  pool.connect(function(err, client){
-    if(err){
+function getDrawlist(roomId) {
+  pool.connect(function (err, client) {
+    if (err) {
       console.log(err);
-    }else{
-      client.query("SELECT drawlist FROM rooms WHERE id = " + roomId, function(err, result){
-        if(err){
+    } else {
+      client.query("SELECT drawlist FROM rooms WHERE id = " + roomId, function (
+        err,
+        result
+      ) {
+        if (err) {
           throw err;
         }
         console.log(JSON.stringify(result));
         console.log(JSON.stringify(result.rows[0].drawlist));
         return result.rows[0].drawlist;
-      })
+      });
     }
-  })
+  });
 }
-
 
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
 function enterRoom(userId, roomId) {
-    console.log("enterRoom :" + userId + " " + roomId);
+  console.log("enterRoom :" + userId + " " + roomId);
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
     } else {
-
       //過去に入室したことがあるかどうかを調べます，具体的には
       //指定したルームにいる人全員のユーザIDを取得して，引数のものと一致するものがあるか調べます
       var user_in_this_room;
-      client.query("SELECT userid FROM member WHERE roomid = " + roomId, function (err, result) {
-        if (err) {
-          throw err;
-        }
-        console.log("result:" + JSON.stringify(result));
-        console.log("result.rows:" + JSON.stringify(result.rows));
-        var userlist = result.rows.map(function(obj){return obj.userid});
-        console.log("userlist: " + JSON.stringify(userlist));
-        user_in_this_room = userlist.indexOf(userId);
-        console.log("user_in_this_room in else sentence:" + user_in_this_room);
-        //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
-    //   });
+      client.query(
+        "SELECT userid FROM member WHERE roomid = " + roomId,
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          console.log("result:" + JSON.stringify(result));
+          console.log("result.rows:" + JSON.stringify(result.rows));
+          var userlist = result.rows.map(function (obj) {
+            return obj.userid;
+          });
+          console.log("userlist: " + JSON.stringify(userlist));
+          user_in_this_room = userlist.indexOf(userId);
+          console.log(
+            "user_in_this_room in else sentence:" + user_in_this_room
+          );
+          //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
+          //   });
 
-        console.log("user_in_this_room:" + user_in_this_room);
-        //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
-        if(user_in_this_room === -1){
+          console.log("user_in_this_room:" + user_in_this_room);
+          //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
+          if (user_in_this_room === -1) {
             client.query(
-            "INSERT INTO member(ink, roomid, userid) VALUES (" +
+              "INSERT INTO member(ink, roomid, userid) VALUES (" +
                 MAXINK +
                 ", " +
                 roomId +
                 ", '" +
                 userId +
                 "')",
-            function (err, result) {
+              function (err, result) {
                 if (err) {
-                throw err;
+                  throw err;
                 }
-            }
+              }
             );
-            pool.connect(function(err, client){
-                if(err){
-                  console.log(err);
-                }else{
-                  client.query("SELECT drawlist FROM rooms WHERE id = " + roomId, function(err, result){
-                    if(err){
+            pool.connect(function (err, client) {
+              if (err) {
+                console.log(err);
+              } else {
+                client.query(
+                  "SELECT drawlist FROM rooms WHERE id = " + roomId,
+                  function (err, result) {
+                    if (err) {
                       throw err;
                     }
                     // console.log(JSON.stringify(result));
                     console.log(JSON.stringify(result.rows[0].drawlist));
                     ret_data = {
-                        drawlist: result.rows[0].drawlist, 
-                        ink: MAXINK
+                      drawlist: result.rows[0].drawlist,
+                      ink: MAXINK,
+                    };
+                    console.log("ret_data at enterRoom()" + ret_data);
+                    return ret_data;
                   }
-                  console.log("ret_data at enterRoom()" + ret_data);
-                    return ret_data})
-                }
-              })
+                );
+              }
+            });
             // console.log("new room:" + getDrawlist(roomId));
             // drawlist = getDrawlist(roomId);
             // return {
-            // // drawlist: getDrawlist(roomId), 
-            // drawlist: drawlist, 
+            // // drawlist: getDrawlist(roomId),
+            // drawlist: drawlist,
             // ink: MAXINK
             // };
-        }
-        else{//過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
+          } else {
+            //過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
             var restInk;
-            client.query("SELECT ink FROM member WHERE roomid = " + roomId + " AND userid = '" + userId + "'", function (err, result) {
-            if (err) {
-                throw err;
-            }
-            restInk = result.rows[0].ink;
-            });
+            client.query(
+              "SELECT ink FROM member WHERE roomid = " +
+                roomId +
+                " AND userid = '" +
+                userId +
+                "'",
+              function (err, result) {
+                if (err) {
+                  throw err;
+                }
+                restInk = result.rows[0].ink;
+              }
+            );
             console.log("existed room:" + getDrawlist(roomId));
             return {
-            drawlist: getDrawlist(roomId),
-            ink: restInk
+              drawlist: getDrawlist(roomId),
+              ink: restInk,
             };
+          }
         }
-    });
-
+      );
     }
   });
 }
@@ -253,11 +271,11 @@ function update(roomId, userId, base64Image, drawlist, restInk) {
     } else {
       //roomsテーブル
       client.query(
-        "UPDATE rooms SET img = '" + 
-          base64Image + 
-          "'::bytea, drawlist = '" + 
-          drawlist + 
-          "' WHERE id = " + 
+        "UPDATE rooms SET img = '" +
+          base64Image +
+          "'::bytea, drawlist = '" +
+          drawlist +
+          "' WHERE id = " +
           roomId,
         function (err, result) {
           if (err) {
@@ -272,7 +290,7 @@ function update(roomId, userId, base64Image, drawlist, restInk) {
           " WHERE roomid = " +
           roomId +
           " AND userid = '" +
-          userId + 
+          userId +
           "'",
         function (err, result) {
           if (err) {
