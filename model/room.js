@@ -134,6 +134,7 @@ function getDrawlist(roomId){
 //enterRoom():joinしたメンバー情報でDB:memberを更新します
 //！！一時的に最大メンバー数を考慮していません！！
 function enterRoom(userId, roomId) {
+    console.log("enterRoom :" + userId + " " + roomId);
   pool.connect(function (err, client) {
     if (err) {
       console.log(err);
@@ -146,6 +147,8 @@ function enterRoom(userId, roomId) {
         if (err) {
           throw err;
         }
+        console.log("result:" + result);
+        console.log("result.rows:" + result.rows);
         user_in_this_room = result.rows.indexOf(userId);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
