@@ -26,7 +26,7 @@ function io(server) {
             socket.join(msg.roomId);
             const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
-            (async () => {
+            (async (msg) => {
             console.log('スタート');
             ret_data = room.enterRoom(msg.userId, msg.roomId);
             await sleep(1000);
