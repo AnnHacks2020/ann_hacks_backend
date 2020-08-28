@@ -24,17 +24,28 @@ function io(server) {
             };
             store[msg.userId] = usrobj;
             socket.join(msg.roomId);
-            const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
+            // const sleep = msec => new Promise(resolve => setTimeout(resolve, msec));
 
-            (async () => {
-            console.log('スタート');
-            ret_data = room.enterRoom(msg.userId, msg.roomId);
-            await sleep(1000);
-            //最初の座標とタグのリスト(drawlist)とインク量
-            console.log("ret_data:" + ret_data);
-            socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
-            console.log('1秒経ってる!')
-            })();
+            // (async (msg) => {
+            // console.log('スタート');
+            // ret_data = room.enterRoom(msg.userId, msg.roomId);
+            // await sleep(2000);
+            // //最初の座標とタグのリスト(drawlist)とインク量
+            // console.log("ret_data:" + ret_data);
+            // socket.broadcast.to(store[msg.userId].room).emit('send user init', ret_data);
+            // console.log('1秒経ってる!')
+            // })(msg);
+
+            const promise = new Promise((resolve, reject) => {
+                ret_data = room.enterRoom(msg.userId, msg.roomId);
+                console.log("ret_data:" + ret_data);
+                resolve(ret_data);
+            });
+            promise.then((value) => {
+                console.log("ret_data(value):" + value);
+                socket.to(store[msg.userId].room).emit('send user init', value);
+            })
+
             // ret_data = room.enterRoom(msg.userId, msg.roomId);
             //  //最初の座標とタグのリスト(drawlist)とインク量
             // console.log(ret_data);

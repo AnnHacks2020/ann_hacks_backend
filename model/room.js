@@ -152,12 +152,12 @@ function enterRoom(userId, roomId) {
           if (err) {
             throw err;
           }
-          console.log("result:" + JSON.stringify(result));
-          console.log("result.rows:" + JSON.stringify(result.rows));
+        //   console.log("result:" + JSON.stringify(result));
+        //   console.log("result.rows:" + JSON.stringify(result.rows));
           var userlist = result.rows.map(function (obj) {
             return obj.userid;
           });
-          console.log("userlist: " + JSON.stringify(userlist));
+        //   console.log("userlist: " + JSON.stringify(userlist));
           user_in_this_room = userlist.indexOf(userId);
           console.log(
             "user_in_this_room in else sentence:" + user_in_this_room
@@ -193,7 +193,7 @@ function enterRoom(userId, roomId) {
                       throw err;
                     }
                     // console.log(JSON.stringify(result));
-                    console.log(JSON.stringify(result.rows[0].drawlist));
+                    // console.log(JSON.stringify(result.rows[0].drawlist));
                     ret_data = {
                       drawlist: result.rows[0].drawlist,
                       ink: MAXINK,
@@ -227,11 +227,33 @@ function enterRoom(userId, roomId) {
                 restInk = result.rows[0].ink;
               }
             );
-            console.log("existed room:" + getDrawlist(roomId));
-            return {
-              drawlist: getDrawlist(roomId),
-              ink: restInk,
-            };
+            pool.connect(function (err, client) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  client.query(
+                    "SELECT drawlist FROM rooms WHERE id = " + roomId,
+                    function (err, result) {
+                      if (err) {
+                        throw err;
+                      }
+                      // console.log(JSON.stringify(result));
+                    //   console.log(JSON.stringify(result.rows[0].drawlist));
+                      ret_data = {
+                        drawlist: result.rows[0].drawlist,
+                        ink: restInk,
+                      };
+                      console.log("ret_data at enterRoom()" + ret_data);
+                      return ret_data;
+                    }
+                  );
+                }
+              });
+            // console.log("existed room:" + getDrawlist(roomId));
+            // return {
+            //   drawlist: getDrawlist(roomId),
+            //   ink: restInk,
+            // };
           }
         }
       );
