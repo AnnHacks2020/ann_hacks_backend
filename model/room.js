@@ -176,8 +176,10 @@ function enterRoom(userId, roomId) {
             }
             );
             console.log("new room:" + getDrawlist(roomId));
+            drawlist = getDrawlist(roomId);
             return {
-            drawlist: getDrawlist(roomId), 
+            // drawlist: getDrawlist(roomId), 
+            drawlist: drawlist, 
             ink: MAXINK
             };
         }
