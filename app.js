@@ -35,6 +35,7 @@ app.get("/", (req, res) => {
 //   res.sendFile(__dirname + "/controller/index.html");
 });
 
+app.use(express.static(__dirname + "/public"));
 app.use("/room", room)
 
 console.log(process.env.ENV_DB, process.env.ENV_USER);
