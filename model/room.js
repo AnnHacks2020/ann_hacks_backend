@@ -185,10 +185,12 @@ function enterRoom(userId, roomId) {
                     }
                     // console.log(JSON.stringify(result));
                     console.log(JSON.stringify(result.rows[0].drawlist));
-                    return {
+                    ret_data = {
                         drawlist: result.rows[0].drawlist, 
                         ink: MAXINK
-                  }})
+                  }
+                  console.log("ret_data at enterRoom()" + ret_data);
+                    return ret_data})
                 }
               })
             // console.log("new room:" + getDrawlist(roomId));
