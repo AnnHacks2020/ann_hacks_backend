@@ -150,6 +150,7 @@ function enterRoom(userId, roomId) {
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
 
+      console.log("user_in_this_room:" + user_in_this_room);
       //user_in_this_roomに-1が入っていたら，memberに新しい列をINSERTし，drawlistとインク量を返します
       if(user_in_this_room === -1){
         client.query(
@@ -166,6 +167,7 @@ function enterRoom(userId, roomId) {
             }
           }
         );
+        console.log("new room:" + getDrawlist(roomId));
         return {
           drawlist: getDrawlist(roomId), 
           ink: MAXINK
@@ -179,6 +181,7 @@ function enterRoom(userId, roomId) {
           }
           restInk = result.rows[0];
         });
+        console.log("existed room:" + getDrawlist(roomId));
         return {
           drawlist: getDrawlist(roomId),
           ink: restInk
