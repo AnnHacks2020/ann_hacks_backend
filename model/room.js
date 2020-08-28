@@ -175,13 +175,29 @@ function enterRoom(userId, roomId) {
                 }
             }
             );
-            console.log("new room:" + getDrawlist(roomId));
-            drawlist = getDrawlist(roomId);
-            return {
-            // drawlist: getDrawlist(roomId), 
-            drawlist: drawlist, 
-            ink: MAXINK
-            };
+            pool.connect(function(err, client){
+                if(err){
+                  console.log(err);
+                }else{
+                  client.query("SELECT drawlist FROM rooms WHERE id = " + roomId, function(err, result){
+                    if(err){
+                      throw err;
+                    }
+                    // console.log(JSON.stringify(result));
+                    // console.log(JSON.stringify(result.rows[0].drawlist));
+                    return {
+                        drawlist: result.rows[0].drawlist, 
+                        ink: MAXINK
+                  }})
+                }
+              })
+            // console.log("new room:" + getDrawlist(roomId));
+            // drawlist = getDrawlist(roomId);
+            // return {
+            // // drawlist: getDrawlist(roomId), 
+            // drawlist: drawlist, 
+            // ink: MAXINK
+            // };
         }
         else{//過去に入室があれば，memberから該当の列を引っ張り出し，drawlistとインク量を返します
             var restInk;
