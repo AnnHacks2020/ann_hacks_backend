@@ -58,15 +58,15 @@ app.get("/", (req, res) => {
     } else {
       var gallery;
       var favs;
-      client.query("SELECT id, theme, img, fav FROM ROOMS", function (
-        err,
-        result
-      ) {
-        if (err) {
-          throw err;
+      client.query(
+        "SELECT id, theme, encode(img, 'base64'), fav FROM ROOMS",
+        function (err, result) {
+          if (err) {
+            throw err;
+          }
+          gallery = result.rows;
         }
-        gallery = result.rows;
-      });
+      );
       // お気に入りしたroom一覧を取得
       client.query(
         "SELECT roomid FROM fav WHERE userid='" + userID + "'",
