@@ -62,7 +62,7 @@ function makeRoom(hostUserId, theme, due) {
         if(err){
           throw err;
         }
-        base64Image = result.rows[0];
+        base64Image = result.rows[0].img;
       });
       //roomsテーブル
       client.query(
@@ -124,7 +124,7 @@ function getDrawlist(roomId){
         if(err){
           throw err;
         }
-        return result.rows[0];
+        return result.rows[0].drawlist;
       })
     }
   })
@@ -149,7 +149,8 @@ function enterRoom(userId, roomId) {
         }
         console.log("result:" + JSON.stringify(result));
         console.log("result.rows:" + JSON.stringify(result.rows));
-        user_in_this_room = result.rows.userId.indexOf(userId);
+        var userlist = result.rows.map(function(obj){return obj.userid}); 
+        user_in_this_room = userlist.indexOf(userId);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
 
@@ -182,7 +183,7 @@ function enterRoom(userId, roomId) {
           if (err) {
             throw err;
           }
-          restInk = result.rows[0];
+          restInk = result.rows[0].ink;
         });
         console.log("existed room:" + getDrawlist(roomId));
         return {
