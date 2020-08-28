@@ -152,6 +152,7 @@ function enterRoom(userId, roomId) {
         var userlist = result.rows.map(function(obj){return obj.userid});
         console.log("userlist: " + JSON.stringify(userlist));
         user_in_this_room = userlist.indexOf(userId);
+        console.log("user_in_this_room in else sentence:" + user_in_this_room);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
 
