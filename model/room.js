@@ -149,7 +149,8 @@ function enterRoom(userId, roomId) {
         }
         console.log("result:" + JSON.stringify(result));
         console.log("result.rows:" + JSON.stringify(result.rows));
-        var userlist = result.rows.map(function(obj){return obj.userid}); 
+        var userlist = result.rows.map(function(obj){return obj.userid});
+        console.log("userlist: " + JSON.stringify(userlist));
         user_in_this_room = userlist.indexOf(userId);
         //過去の入室がなければ(はじめて来たならば)user_in_this_roomに-1が入ります
       });
