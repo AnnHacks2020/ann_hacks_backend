@@ -124,6 +124,7 @@ function getDrawlist(roomId){
         if(err){
           throw err;
         }
+        console.log(JSON.stringify(result));
         return result.rows[0].drawlist;
       })
     }
