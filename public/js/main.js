@@ -250,7 +250,7 @@ window.addEventListener('load', () => {
   });
 
   socket.on('send user fix', function (drawlist) {
-    fixImageLoad(JSON.parse(drawlist))
+    fixImageLoad(drawlist)
   });
 
   function fixImageLoad(drawlist) {
